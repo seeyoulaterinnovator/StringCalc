@@ -2,59 +2,72 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        var expression = new Scanner(System.in).nextLine();
-        char sign;
-        String[] entexp;
-        if (expression.contains(" + ")) {
-            entexp = expression.split(" \\+ ");
-            sign = '+';
-        } else if (expression.contains(" - ")) {
-            entexp = expression.split(" - ");
-            sign = '-';
-        } else if (expression.contains(" * ")) {
-            entexp = expression.split(" \\* ");
-            sign = '*';
-        } else if (expression.contains(" / ")) {
-            entexp = expression.split(" / ");
-            sign = '/';
+        Scanner scn = new Scanner(System.in);
+        String exp = scn.nextLine();
+        char action;
+        String[] data;
+        if (exp.contains(" + ")) {
+            data = exp.split(" \\+ ");
+            action = '+';
+        } else if (exp.contains(" - ")) {
+            data = exp.split(" - ");
+            action = '-';
+        } else if (exp.contains(" * ")) {
+            data = exp.split(" \\* ");
+            action = '*';
+        } else if (exp.contains(" / ")) {
+            data = exp.split(" / ");
+            action = '/';
         } else {
             throw new Exception("Некорректный знак действия");
         }
-        if (sign == '*' || sign == '/') {
-            if (entexp[1].contains("\"")) throw new Exception("Строчку можно делить или умножать только на число");
+        if (action == '*' || action == '/') {
+            if (data[1].contains("\"")) throw new Exception("Строчку можно делить или умножать только на число");
         }
-        for (int i = 0; i < entexp.length; i++) {
-            entexp[i] = entexp[i].replace("\"", "");
-        }
-
-        if (sign == '+') {
-            System.out.println("\"" + entexp[0] + entexp[1] + "\"");
-
-        } else if (sign == '-') {
-            int index = entexp[0].indexOf(entexp[1]);
-            if (index == -1) {
-                System.out.println("\"" + entexp[0] + "\"");
-
-            } else {
-                String result = entexp[0].substring(0, index);
-                result += entexp[0].substring(index + entexp[1].length());
-                System.out.println("\"" + result + "\"");
-
+        for (int i = 0; i < data.length; i++) {
+            data[i] = data[i].replace("\"", "");
+            if (data[i].length() > 10) {
+                throw new IllegalArgumentException("Калькулятор может принимать строки длиной от 1 до 10 символов");
             }
-        } else if (sign == '*') {
-            int multiplier = Integer.parseInt(entexp[1]);
+        }
+
+        if (action == '+') {
+            printInQuotes(data[0] + data[1]);
+        } else if (action == '*') {
+            if (!data[1].matches("[1-9]|10")) {
+                throw new IllegalArgumentException("числа дожны быть от 1 до 10");
+            }
+            int multiplier = Integer.parseInt(data[1]);
             String result = "";
             for (int i = 0; i < multiplier; i++) {
-                result += entexp[0];
+                result += data[0];
             }
-            System.out.println("\"" + result + "\"");
-
+            printInQuotes(result);
+        } else if (action == '-') {
+            int index = data[0].indexOf(data[1]);
+            if (index == -1) {
+                printInQuotes(data[0]);
+            } else {
+                String result = data[0].substring(0, index);
+                result += data[0].substring(index + data[1].length());
+                printInQuotes(result);
+            }
         } else {
-            int newLeng = entexp[0].length() / Integer.parseInt(entexp[1]);
-            String result = entexp[0].substring(0, newLeng);
-            System.out.println("\"" + result + "\"");
+            if (!data[1].matches("[1-9]|10")) {
+                throw new IllegalArgumentException("числа дожны быть от 1 до 10");
+            }
+            int newLen = data[0].length() / Integer.parseInt(data[1]);
+            String result = data[0].substring(0, newLen);
+            printInQuotes(result);
         }
 
     }
 
+    static void printInQuotes(String text) throws Exception {
+        if (text.length() > 40) {
+            System.out.println("\"" + text.substring(0, 40) + "..." + "\"");
+        } else {
+            System.out.println("\"" + text + "\"");
+        }
+    }
 }
